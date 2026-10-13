@@ -102,9 +102,19 @@ in {
   # This is the inverse of _filter_ldflags in the wrapper scripts above:
   # wrappers keep only cross-target paths; here we remove them.
   shell.shellHook =
-    let prefixPattern = lib.concatMapStringsSep "|" (p: "*${p}*") targetPrefixes;
+    let
+      prefixPattern = lib.concatMapStringsSep "|" (p: "*${p}*") targetPrefixes;
+      # When targetPrefixes = [], prefixPattern is "" and the naive
+      # "*wasm*|${prefixPattern}" produces "*wasm*|" — a dangling
+      # case-alternative that bash rejects with
+      # `syntax error near unexpected token ')'`. Only concatenate
+      # when we actually have cross-prefix patterns to add.
+      filterPattern =
+        if prefixPattern == ""
+          then "*wasm*"
+          else "*wasm*|${prefixPattern}";
     in ''
-      ${mkFilterLdflags "_filter_native_ldflags" "*wasm*|${prefixPattern}" false}
+      ${mkFilterLdflags "_filter_native_ldflags" filterPattern false}
 
       export NIX_LDFLAGS_UNFILTERED="$NIX_LDFLAGS"
       export NIX_LDFLAGS_FOR_TARGET_UNFILTERED="$NIX_LDFLAGS_FOR_TARGET"
