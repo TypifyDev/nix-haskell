@@ -77,11 +77,8 @@ library
 
   -- Other library packages from which modules are imported.
   build-depends:    base
-                  , reflex
                   , file-embed
                   , ghcjs-dom
-                  , reflex-dom-core
-                  , reflex-dom
                   , containers
                   , text
 
@@ -94,7 +91,6 @@ library
 executable reflex-todomvc
   build-depends:    base
                   , ghcjs-dom
-                  , reflex-dom
                   , reflex-todomvc
 
   hs-source-dirs: src-bin
